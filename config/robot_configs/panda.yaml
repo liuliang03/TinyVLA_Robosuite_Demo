@@ -1,0 +1,58 @@
+# Panda 机器人配置
+
+robot:
+  name: "Panda"
+  dof: 7  # 自由度
+
+  # 控制器配置
+  controller:
+    type: "OSC_POSE"
+    impedance_mode: "fixed"
+    kp: [100] * 6  # 位置/旋转增益
+    kd: [10] * 6   # 阻尼增益
+    force_limit: 200
+    position_limits:
+      x: [-0.5, 0.5]
+      y: [-0.5, 0.5]
+      z: [0.0, 0.8]
+
+  # 夹爪配置
+  gripper:
+    type: "default"  # default, binary
+    open_threshold: 0.05
+    close_threshold: 0.02
+    max_force: 20
+
+  # 工作空间
+  workspace:
+    # 工作空间范围（米）
+    range:
+      x: [-0.5, 0.5]
+      y: [-0.5, 0.5]
+      z: [0.0, 0.8]
+
+    # 安全限制
+    safety_limits:
+      max_velocity: 1.0  # m/s
+      max_acceleration: 5.0  # m/s^2
+      max_jerk: 20.0  # m/s^3
+
+# 相机配置
+cameras:
+  frontview:
+    position: [0.5, 0.0, 0.5]
+    quaternion: [0.5, 0.5, -0.5, 0.5]
+    image_size: [224, 224]
+    fov: 45
+
+  birdview:
+    position: [0.0, 0.0, 1.0]
+    quaternion: [0.707, 0.0, 0.0, 0.707]
+    image_size: [224, 224]
+    fov: 60
+
+  agentview:
+    position: [0.3, 0.3, 0.4]
+    quaternion: [0.0, 0.0, 0.0, 1.0]
+    image_size: [224, 224]
+    fov: 50

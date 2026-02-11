@@ -1,0 +1,74 @@
+# TinyVLA 模型配置文件
+
+# VLM Backbone 配置
+vlm_backbone:
+  model_name: "Llava-Pythia-400M"
+  huggingface_id: "lesjie/Llava-Pythia-400M"
+
+  # 模型变体选项
+  variants:
+    small:
+      name: "Llava-Pythia-400M"
+      params: "400M"
+      model_id: "lesjie/Llava-Pythia-400M"
+      local_path: "models/llava_pythia/Llava-Pythia-400M"
+
+    base:
+      name: "Llava-Pythia-700M"
+      params: "700M"
+      model_id: "lesjie/Llava-Pythia-700M"
+      local_path: "models/llava_pythia/Llava-Pythia-700M"
+
+    large:
+      name: "Llava-Pythia-1.3B"
+      params: "1.3B"
+      model_id: "lesjie/Llava-Pythia-1.3B"
+      local_path: "models/llava_pythia/Llava-Pythia-1.3B"
+
+# 默认使用的模型
+default_variant: "small"
+
+# Policy Head 配置
+policy_head:
+  type: "diffusion"
+  hidden_dim: 512
+  num_layers: 6
+  action_dim: 7
+
+  # 训练配置
+  batch_size: 32
+  learning_rate: 1e-4
+  num_epochs: 100
+
+# 推理配置
+inference:
+  device: "cpu"  # cpu or cuda
+  dtype: "float32"  # float32, float16
+  use_cache: true
+  max_new_tokens: 100
+
+  # 扩散解码配置
+  diffusion:
+    enabled: true
+    num_steps: 20
+    scheduler: "ddpm"
+    beta_schedule: "linear"
+
+  # 温度采样配置
+  temperature: 1.0
+  top_k: 50
+  top_p: 0.95
+
+# 模型路径配置
+paths:
+  models_dir: "models"
+  cache_dir: "models/llava_pythia"
+  checkpoints_dir: "models/checkpoints"
+  logs_dir: "logs"
+
+# 下载配置
+download:
+  use_mirror: false  # 使用镜像站
+  mirror_url: "https://hf-mirror.com"
+  retry_count: 3
+  timeout: 300

@@ -1,0 +1,92 @@
+# TinyVLA + robosuite 演示系统默认配置
+
+# 机器人配置
+robot:
+  name: "Panda"  # 机器人类型: Panda, Sawyer, UR5e
+  controller_type: "OSC_POSE"  # 控制器类型: OSC_POSE, OSC_POSITION, JOINT_POSITION
+  control_frequency: 20  # 控制频率 Hz
+  horizon: 500  # 最大步数
+
+# 环境配置
+environment:
+  task_name: "Lift"  # 任务类型: Lift, PickPlace, Stack, TwoArmLift
+  has_renderer: true
+  has_offscreen_renderer: true
+  render_camera: "frontview"
+  camera_names: ["frontview", "birdview", "agentview"]
+  image_size: [224, 224]  # [width, height]
+
+# VLA 模型配置
+vla:
+  model_path: "models/tinyvla"  # 模型路径
+  model_name: "tinyvla-base"  # 模型名称
+  device: "cpu"  # cpu 或 cuda
+  dtype: "float32"  # float32, float16, bfloat16
+  use_cache: true
+  batch_size: 1
+
+  # 推理参数
+  inference:
+    temperature: 1.0
+    top_k: 50
+    top_p: 0.95
+    num_samples: 1
+
+# 动作空间配置
+action:
+  action_dim: 7  # [x, y, z, rx, ry, rz, gripper]
+  action_scale: 0.1  # 动作缩放因子
+  gripper_action: 1.0  # 夹爪动作: 1.0 (闭合), -1.0 (打开)
+  workspace_bounds:
+    x: [-0.5, 0.5]
+    y: [-0.5, 0.5]
+    z: [0.0, 0.8]
+
+# 图像预处理配置
+vision:
+  target_size: [224, 224]
+  normalize: true
+  color_space: "RGB"  # RGB, BGR, GRAY
+  data_format: "CHW"  # CHW, HWC
+
+# 语言指令配置
+language:
+  default_language: "en"  # en, zh
+  instruction_template: "Pick up the {object}"
+  max_length: 77
+
+# 控制器配置
+controller:
+  max_steps: 500
+  early_termination: true
+  reward_threshold: 1.0
+  action_smoothing: true
+  smoothing_window: 3
+
+# 可视化配置
+visualization:
+  show_fps: true
+  show_trajectory: true
+  save_video: false
+  video_path: "videos/"
+  video_fps: 30
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_file: "logs/tinyvla_demo.log"
+  console_output: true
+  tensorboard: false
+
+# 性能配置
+performance:
+  num_workers: 0  # 数据加载线程数
+  pin_memory: false
+  benchmark: false
+
+# 调试配置
+debug:
+  verbose: false
+  save_observations: false
+  save_actions: false
+  profiling: false

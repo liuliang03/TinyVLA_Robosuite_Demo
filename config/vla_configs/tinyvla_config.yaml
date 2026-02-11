@@ -1,0 +1,113 @@
+# TinyVLA 模型配置
+
+model:
+  # 模型基本信息
+  name: "tinyvla-base"
+  variant: "base"  # tiny, small, base, large
+  architecture: "vision_language_action"
+
+  # 模型路径
+  path: "models/tinyvla"
+  checkpoint: "model.safetensors"
+  config: "config.json"
+
+  # 模型架构
+  architecture_params:
+    # 视觉编码器
+    vision_encoder:
+      name: "ResNet50"  # ResNet50, ViT-B/16, ViT-L/14
+      pretrained: true
+      output_dim: 1024
+      freeze: false
+
+    # 语言编码器
+    language_encoder:
+      name: "distilbert-base-uncased"  # distilbert, bert-base
+      output_dim: 768
+      max_length: 77
+      freeze: false
+
+    # 动作解码器
+    action_decoder:
+      type: "diffusion"  # diffusion, mlp, transformer
+      hidden_dim: 512
+      num_layers: 6
+      num_heads: 8
+      diffusion_steps: 20
+
+  # 模型尺寸
+  dimensions:
+    vision_dim: 1024
+    language_dim: 768
+    action_dim: 7  # [x, y, z, rx, ry, rz, gripper]
+    hidden_dim: 512
+
+  # 计算配置
+  compute:
+    device: "cpu"  # cpu, cuda, mps
+    dtype: "float32"  # float32, float16, bfloat16
+    use_cache: true
+    compile_model: false
+
+    # 内存优化
+    gradient_checkpointing: false
+    use_flash_attention: false
+
+  # 推理参数
+  inference:
+    temperature: 1.0
+    top_k: 50
+    top_p: 0.95
+    num_samples: 1
+    beam_size: 1
+
+    # 扩散解码参数
+    diffusion:
+      num_steps: 20
+      scheduler: "ddpm"  # ddpm, ddim
+      eta: 0.0
+
+  # 训练配置（参考）
+  training:
+    learning_rate: 1e-4
+    batch_size: 32
+    num_epochs: 100
+    weight_decay: 0.01
+    warmup_steps: 1000
+
+# 预处理配置
+preprocessing:
+  # 图像预处理
+  image:
+    resize: [224, 224]
+    normalize:
+      mean: [0.485, 0.456, 0.406]
+      std: [0.229, 0.224, 0.225]
+    color_jitter: false
+
+  # 文本预处理
+  text:
+    lowercase: true
+    remove_special_chars: false
+    max_length: 77
+    padding: "max_length"
+    truncation: true
+
+  # 动作后处理
+  action:
+    clip: true
+    clip_range: [-1.0, 1.0]
+    smooth: true
+    smoothing_window: 3
+
+# 量化配置（可选）
+quantization:
+  enabled: false
+  mode: "int8"  # int8, fp16, dynamic
+  calibration: true
+
+# ONNX 导出配置（可选）
+onnx:
+  enabled: false
+  opset_version: 17
+  dynamic_axes: true
