@@ -52,6 +52,9 @@ def run_demo(
     max_steps: int = 500,
     render: bool = False,
     verbose: bool = True,
+    model_path: str = None,
+    use_real_model: bool = False,
+    offscreen_render: bool = False,
 ):
     """
     运行演示
@@ -62,8 +65,23 @@ def run_demo(
         max_steps: 最大步数
         render: 是否渲染
         verbose: 是否显示详细信息
+        model_path: 模型路径
+        use_real_model: 是否使用真实模型
+        offscreen_render: 是否使用 offscreen 渲染
     """
     print_banner()
+
+    # 确定模型路径
+    if use_real_model and model_path is None:
+        # 尝试从配置读取
+        from src.utils.config_loader import load_config
+        try:
+            config = load_config()
+            model_path = config.get_model_path("small")
+            if model_path and verbose:
+                print(f"✓ 从配置读取模型路径: {model_path}")
+        except:
+            pass
 
     if verbose:
         print(f"\n配置信息:")
@@ -71,6 +89,10 @@ def run_demo(
         print(f"  指令: {instruction}")
         print(f"  最大步数: {max_steps}")
         print(f"  渲染: {render}")
+        if model_path:
+            print(f"  模型: {model_path}")
+        else:
+            print(f"  模型: 模拟模式")
         print()
 
     # 创建控制器
@@ -80,12 +102,13 @@ def run_demo(
     controller = create_controller(
         task_name=task_name,
         robot_name="Panda",
-        model_path=None,  # 使用模拟模式
+        model_path=model_path,
         device="cpu",
-        use_mock_vla=True,  # 使用模拟 VLA
-        use_mock_mapper=True,  # 使用模拟映射器
+        use_mock_vla=(model_path is None),  # 如果没有模型路径，使用模拟模式
+        use_mock_mapper=False,  # 使用真实的 IK 映射器
         max_steps=max_steps,
         verbose=verbose,
+        offscreen_render=offscreen_render,
     )
 
     if verbose:
@@ -249,6 +272,22 @@ def main():
         action="store_true",
         help="静默模式",
     )
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default=None,
+        help="模型路径（留空使用模拟模式）",
+    )
+    parser.add_argument(
+        "--use-real-model",
+        action="store_true",
+        help="使用真实模型（需要先下载）",
+    )
+    parser.add_argument(
+        "--offscreen-render",
+        action="store_true",
+        help="使用 offscreen 渲染（无需显示服务器）",
+    )
 
     args = parser.parse_args()
 
@@ -264,6 +303,9 @@ def main():
                 max_steps=args.max_steps,
                 render=args.render,
                 verbose=not args.quiet,
+                model_path=args.model_path,
+                use_real_model=args.use_real_model,
+                offscreen_render=args.offscreen_render,
             )
     except KeyboardInterrupt:
         print("\n\n程序被用户中断")

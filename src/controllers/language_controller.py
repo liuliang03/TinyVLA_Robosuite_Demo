@@ -317,6 +317,7 @@ class ControllerBuilder:
         task_name: str = "Lift",
         robot_name: str = "Panda",
         controller_type: str = "BASIC",
+        **env_kwargs
     ) -> "ControllerBuilder":
         """设置仿真环境"""
         from src.environments.robosuite_env import create_env
@@ -324,6 +325,7 @@ class ControllerBuilder:
             task_name=task_name,
             robot_name=robot_name,
             controller_type=controller_type,
+            **env_kwargs
         )
         return self
 
